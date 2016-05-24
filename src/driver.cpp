@@ -18,10 +18,12 @@ asgard::driver_connector driver;
 // The remote IDs
 int source_id = -1;
 int echo_action_id = -1;
+int redirect_action_id = -1;
 
 void stop(){
     std::cout << "asgard:echo: stop the driver" << std::endl;
 
+    asgard::unregister_action(driver, source_id, redirect_action_id);
     asgard::unregister_action(driver, source_id, echo_action_id);
     asgard::unregister_source(driver, source_id);
 
@@ -53,6 +55,7 @@ int main(){
      // Register the source and actions
     source_id = asgard::register_source(driver, "echo");
     echo_action_id = asgard::register_action(driver, source_id, "STRING", "echo");
+    redirect_action_id = asgard::register_action(driver, source_id, "SIMPLE", "redirect");
 
     // Listen for messages from the server
     while(true){
@@ -68,11 +71,12 @@ int main(){
         if(command == "ACTION"){
             std::string action;
             message_ss >> action;
-
-            if(action == "echo"){     
+            if(action == "echo"){
                 std::string value;
                 message_ss >> value;
                 std::cout << "asgard:echo: " << value << std::endl;
+            } else {
+                std::cout << "asgard: " << action << std::endl;
             }
         }
     }
